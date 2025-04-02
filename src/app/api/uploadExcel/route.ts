@@ -10,7 +10,7 @@ const SCOPES = [
   "https://www.googleapis.com/auth/drive.file",
 ];
 
-const { privateKey } = JSON.parse(process.env.FIREBASE_PRIVATE_KEY!);
+const { privateKey } = JSON.parse(process.env.GOOGLE_PRIVATE_KEY!);
 
 const jwt = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
