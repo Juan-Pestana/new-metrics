@@ -27,7 +27,7 @@ export const config = {
   },
 };
 
-export async function POST(request: Request, res: NextApiResponse) {
+export async function POST(request: Request) {
   if (request.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
