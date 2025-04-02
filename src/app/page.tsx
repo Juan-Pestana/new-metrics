@@ -34,6 +34,7 @@ export default function UploadExcel() {
       }
     } catch (error) {
       alert("Upload failed.");
+      console.error("Upload error:", error);
     } finally {
       setIsLoading(false);
     }

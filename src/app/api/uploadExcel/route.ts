@@ -73,7 +73,7 @@ export async function POST(request: Request, res: NextApiResponse) {
 
   await sheet.setHeaderRow(headers);
 
-  //@ts-ignore
+  //@ts-expect-error
   await sheet.addRows(jsonData);
 
   const resultSheet = doc.sheetsByTitle["result"];
