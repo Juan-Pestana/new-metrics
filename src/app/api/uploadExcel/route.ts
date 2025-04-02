@@ -1,4 +1,3 @@
-import type { NextApiResponse } from "next";
 import * as XLSX from "xlsx";
 import { Parser } from "json2csv";
 import { GoogleSpreadsheet } from "google-spreadsheet";
