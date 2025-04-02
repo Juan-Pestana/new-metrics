@@ -4,13 +4,12 @@ import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 
 // the file saved above
+const privateKey = process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, "\n");
 
 const SCOPES = [
   "https://www.googleapis.com/auth/spreadsheets",
   "https://www.googleapis.com/auth/drive.file",
 ];
-
-const { privateKey } = await JSON.parse(process.env.GOOGLE_PRIVATE_KEY!);
 
 const jwt = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
