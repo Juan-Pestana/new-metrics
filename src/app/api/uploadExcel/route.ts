@@ -72,8 +72,7 @@ export async function POST(request: Request, res: NextApiResponse) {
   //validate headers here
 
   await sheet.setHeaderRow(headers);
-
-  //@ts-expect-error
+  //@ts-expect-error this is a workaround for the type error
   await sheet.addRows(jsonData);
 
   const resultSheet = doc.sheetsByTitle["result"];
