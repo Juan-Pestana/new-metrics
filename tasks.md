@@ -1,0 +1,6 @@
+- leemos la data en formato json
+- convertimos la fecha de las escalas a yyyy-mm-dd
+- filtramos las escalas por nombre de la scala
+- tinetti y barthel evaluamos que mejore
+- para escala EUROQOL contamos el numero de registros por persona
+- para la escala Tinneti-M, filtramos aquellas en las que el valor final y contamos

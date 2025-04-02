@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "formidable": "^3.5.2",
+    "google-auth-library": "^9.15.1",
+    "google-spreadsheet": "^4.1.4",
     "json2csv": "^6.0.0-alpha.2",
     "next": "15.1.7",
     "react": "^19.0.0",
