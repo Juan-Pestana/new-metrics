@@ -29,7 +29,10 @@ export const config = {
 
 export async function POST(request: Request) {
   if (request.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" });
+    return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
+      status: 405,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const formData = await request.formData();
@@ -37,7 +40,10 @@ export async function POST(request: Request) {
   console.log("form data", formData, file);
 
   if (!file) {
-    return res.status(400).json({ message: "No file uploaded" });
+    return new Response(JSON.stringify({ message: "No file uploaded" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const arrayBuffer = await file.arrayBuffer();
