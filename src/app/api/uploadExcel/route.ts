@@ -7,13 +7,21 @@ import { JWT } from "google-auth-library";
 const decodePrivateKey = (key: string | undefined): string => {
   if (!key) throw new Error("GOOGLE_PRIVATE_KEY is not defined");
 
-  // Decode any Unicode escape sequences
-  const decodedKey = key.replace(/\\u[\dA-F]{4}/gi, (match) =>
+  // First, handle any Unicode escape sequences
+  let decodedKey = key.replace(/\\u[\dA-F]{4}/gi, (match) =>
     String.fromCharCode(parseInt(match.replace(/\\u/g, ""), 16))
   );
 
-  // Remove quotes and normalize newlines
-  return decodedKey.replace(/^["']|["']$/g, "").replace(/\\n/g, "\n");
+  // Remove enclosing quotes if present
+  decodedKey = decodedKey.replace(/^["']|["']$/g, "");
+
+  // Check if the key already contains actual newlines
+  if (decodedKey.includes("\n")) {
+    return decodedKey;
+  }
+
+  // If not, replace escaped newlines with actual newlines
+  return decodedKey.replace(/\\n/g, "\n");
 };
 const SCOPES = [
   "https://www.googleapis.com/auth/spreadsheets",
