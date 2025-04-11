@@ -3,7 +3,7 @@ import { Parser } from "json2csv";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
 
-// the file saved above
+// handle super anoying google private key format
 const decodePrivateKey = (key: string | undefined): string => {
   if (!key) throw new Error("GOOGLE_PRIVATE_KEY is not defined");
 
@@ -33,16 +33,29 @@ const jwt = new JWT({
   key: decodePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
   scopes: SCOPES,
 });
-const doc = new GoogleSpreadsheet(
-  "1xLb2Heh90wsb-MwtYCFT2Z8p2zQyHjMPEmpUsRA8DYY",
-  jwt
-);
+
+// this is the only processing configuration required.
+// probably should be comming from db user config or something
+const logicConfigs = {
+  sheets_id: "1xLb2Heh90wsb-MwtYCFT2Z8p2zQyHjMPEmpUsRA8DYY",
+  file_colums: [
+    { column_header: "column1" },
+    { column_header: "column2" },
+    { column_header: "column3" },
+    //...
+  ],
+};
+
+// Initialize the Google Spreadsheet
+const doc = new GoogleSpreadsheet(logicConfigs.sheets_id, jwt);
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+// Add your processing logic configurations here
 
 export async function POST(request: Request) {
   if (request.method !== "POST") {
@@ -63,6 +76,7 @@ export async function POST(request: Request) {
     });
   }
 
+  // Turn uploaded file data into json
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
   const workbook = XLSX.read(buffer, { type: "buffer" });
@@ -70,49 +84,39 @@ export async function POST(request: Request) {
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
 
-  // Convert Excel to JSON
   type RawRowData = Record<string, unknown>;
   const jsonData = XLSX.utils.sheet_to_json<RawRowData>(worksheet);
 
+  // take Google sheets file and clear the base sheet selected columns
   await doc.loadInfo();
 
-  //const sheet = doc.sheetsByIndex[0];
   const sheet = doc.sheetsByTitle["base"];
-  await sheet.loadCells();
 
-  // Get the total number of rows in the sheet
-  const totalRows = sheet.rowCount;
-
-  // Clear first 12 columns
-  for (let row = 0; row < totalRows; row++) {
-    for (let col = 0; col < 12; col++) {
-      const cell = sheet.getCell(row, col);
-      cell.value = null;
-    }
-  }
+  await sheet.clear();
 
   const headers = Object.keys(jsonData[0] as Record<string, unknown>);
-  //validate headers here
+  //TO DO validate header names from logic config here
 
+  // Paste the JSON data into Google Sheets Base sheet
   await sheet.setHeaderRow(headers);
   //@ts-expect-error this is a workaround for the type error
   await sheet.addRows(jsonData);
 
+  //get the processed data from the Google Sheets Result sheet
   const resultSheet = doc.sheetsByTitle["result"];
   await resultSheet.loadHeaderRow(); // Ensure headers are loaded
   const resultRows = await resultSheet.getRows();
 
-  // Convert the rows to a plain object array
   const resultData = resultRows.map((row) => {
     const rowData: Record<string, unknown> = {};
     // Use row._rawData or direct property access
     resultSheet.headerValues.forEach((header) => {
-      rowData[header] = row.get(header); // Use get() method instead of direct access
+      rowData[header] = row.get(header);
     });
     return rowData;
   });
 
-  // Convert processed data to CSV
+  // Convert processed data to CSV format and return.
   const json2csvParser = new Parser();
   const csv = json2csvParser.parse(resultData);
 
