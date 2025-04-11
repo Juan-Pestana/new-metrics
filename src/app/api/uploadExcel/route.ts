@@ -2,6 +2,8 @@ import * as XLSX from "xlsx";
 import { Parser } from "json2csv";
 import { GoogleSpreadsheet } from "google-spreadsheet";
 import { JWT } from "google-auth-library";
+import { type NextRequest } from "next/server";
+import { type ProcessingType } from "@/app/page";
 
 // handle super anoying google private key format
 const decodePrivateKey = (key: string | undefined): string => {
@@ -37,17 +39,10 @@ const jwt = new JWT({
 // this is the only processing configuration required.
 // probably should be comming from db user config or something
 const logicConfigs = {
-  sheets_id: "1xLb2Heh90wsb-MwtYCFT2Z8p2zQyHjMPEmpUsRA8DYY",
-  file_colums: [
-    { column_header: "column1" },
-    { column_header: "column2" },
-    { column_header: "column3" },
-    //...
-  ],
+  escalas: "1xLb2Heh90wsb-MwtYCFT2Z8p2zQyHjMPEmpUsRA8DYY",
+  dolor: "1WoiwHYwF2QJ0qctq8WOulSE48rAaR9jFlm7Y64qP48M",
+  ausencias: "",
 };
-
-// Initialize the Google Spreadsheet
-const doc = new GoogleSpreadsheet(logicConfigs.sheets_id, jwt);
 
 export const config = {
   api: {
@@ -57,13 +52,16 @@ export const config = {
 
 // Add your processing logic configurations here
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (request.method !== "POST") {
     return new Response(JSON.stringify({ message: "Method Not Allowed" }), {
       status: 405,
       headers: { "Content-Type": "application/json" },
     });
   }
+
+  const searchParams = request.nextUrl.searchParams;
+  const metricFile = searchParams.get("file") as ProcessingType;
 
   const formData = await request.formData();
   const file = formData.get("file") as unknown as File;
@@ -75,6 +73,18 @@ export async function POST(request: Request) {
       headers: { "Content-Type": "application/json" },
     });
   }
+  if (!metricFile) {
+    return new Response(
+      JSON.stringify({ message: "Please indicate a file Type to upload" }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  // Initialize the Google Spreadsheet
+  const doc = new GoogleSpreadsheet(logicConfigs[metricFile], jwt);
 
   // Turn uploaded file data into json
   const arrayBuffer = await file.arrayBuffer();

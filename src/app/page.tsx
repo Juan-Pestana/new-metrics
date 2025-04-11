@@ -3,12 +3,23 @@ import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 import { useState } from "react";
+
+export type ProcessingType = "escalas" | "dolor" | "ausencias";
 
 export default function UploadExcel() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [processingType, setProcessingType] =
+    useState<ProcessingType>("escalas");
 
   const handleUpload = async () => {
     if (!file) return;
@@ -17,7 +28,7 @@ export default function UploadExcel() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/uploadExcel", {
+      const response = await fetch(`/api/uploadExcel?file=${processingType}`, {
         method: "POST",
         body: formData,
       });
@@ -59,6 +70,23 @@ export default function UploadExcel() {
                 Upload your team&apos;s productivity data file to analyze
                 performance metrics
               </p>
+            </div>
+            <div className="space-y-4">
+              <Select
+                value={processingType}
+                onValueChange={(value: ProcessingType) =>
+                  setProcessingType(value)
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select processing type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="escalas">Escalas</SelectItem>
+                  <SelectItem value="dolor">Dolor</SelectItem>
+                  <SelectItem value="ausencias">Ausencias</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="border-2 border-dashed border-muted rounded-lg p-8 text-center space-y-4">
