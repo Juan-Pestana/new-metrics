@@ -41,7 +41,6 @@ const jwt = new JWT({
 const logicConfigs = {
   escalas: "1xLb2Heh90wsb-MwtYCFT2Z8p2zQyHjMPEmpUsRA8DYY",
   dolor: "1WoiwHYwF2QJ0qctq8WOulSE48rAaR9jFlm7Y64qP48M",
-  ausencias: "",
 };
 
 export const config = {

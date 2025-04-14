@@ -13,7 +13,7 @@ import {
 
 import { useState } from "react";
 
-export type ProcessingType = "escalas" | "dolor" | "ausencias";
+export type ProcessingType = "escalas" | "ausencias";
 
 export default function UploadExcel() {
   const [file, setFile] = useState<File | null>(null);
@@ -84,7 +84,6 @@ export default function UploadExcel() {
                 <SelectContent>
                   <SelectItem value="escalas">Escalas</SelectItem>
                   <SelectItem value="dolor">Dolor</SelectItem>
-                  <SelectItem value="ausencias">Ausencias</SelectItem>
                 </SelectContent>
               </Select>
             </div>
