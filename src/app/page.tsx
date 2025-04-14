@@ -13,7 +13,7 @@ import {
 
 import { useState } from "react";
 
-export type ProcessingType = "escalas" | "ausencias";
+export type ProcessingType = "escalas" | "dolor";
 
 export default function UploadExcel() {
   const [file, setFile] = useState<File | null>(null);
